@@ -1,4 +1,4 @@
-using StreamHub.Components;
+using StreamHup.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,10 +18,9 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-
+app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
