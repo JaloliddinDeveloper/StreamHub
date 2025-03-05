@@ -1,0 +1,16 @@
+﻿@inject IJSRuntime JS
+
+<h3>Blazor Video Chat</h3>
+<button @onclick="StartCall">Start Call</button>
+
+<div>
+    <video id="localVideo" autoplay playsinline></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+</div>
+
+@code {
+    private async Task StartCall()
+    {
+        await JS.InvokeVoidAsync("startCall", "localVideo");
+    }
+}

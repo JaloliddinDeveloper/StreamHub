@@ -1,0 +1,145 @@
+﻿@rendermode InteractiveServer
+@inject IWebHostEnvironment Env
+@inject IVideoMetadataService VideoMetadataService
+@using StreamHub.Models.VideoMetadatas
+@using StreamHub.Services.Foundations
+
+<PageTitle>Student</PageTitle>
+
+<div class="upload-container">
+    <h3>Video Yuklash</h3>
+
+    <div class="form-group">
+        <label>Video fayl:</label>
+        <InputFile OnChange="HandleVideoFileSelected" MaxFileSize="1073741824" accept="video/*" class="file-input" />
+    </div>
+
+    <div class="form-group">
+        <label>Video Title:</label>
+        <InputText @bind-Value="videoTitle" class="text-input" />
+    </div>
+
+    <div class="form-group">
+        <label>Video Description:</label>
+        <InputText @bind-Value="videoDescription" class="text-input" />
+    </div>
+
+    <h3>Thumbnail Yuklash</h3>
+    <div class="form-group">
+        <label>Thumbnail fayl:</label>
+        <InputFile OnChange="HandleThumbnailFileSelected" MaxFileSize="10485760" accept="image/png, image/jpeg" class="file-input" />
+    </div>
+
+    <button @onclick="SaveVideoToWwwRoot" class="btn">Yuklash</button>
+
+    @if (isUploading)
+    {
+        <div class="uploading-message">
+            <p>Biroz kuting, video yuklanmoqda...</p>
+            <div class="icons">
+                <span class="rotating-icon">☀</span>
+                <span class="rotating-icon">☾</span>
+            </div>
+        </div>
+    }
+    else if (!string.IsNullOrEmpty(Message))
+    {
+        <p class="message">@((MarkupString)Message)</p>
+    }
+</div>
+
+<style>
+    :root {
+        --primary-color: #3498db;
+        --primary-color-hover: #2980b9;
+        --secondary-color: #2ecc71;
+        --background-color: #f4f6f8;
+        --text-color: #333;
+        --border-radius: 8px;
+        --transition-speed: 0.3s;
+    }
+
+    body {
+        background: var(--background-color);
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-color);
+    }
+
+    .upload-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: var(--border-radius);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h3 {
+        margin-top: 0;
+        color: var(--primary-color);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    label {
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .text-input, .file-input {
+        padding: 0.75rem;
+        border: 1px solid #ccc;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        transition: border var(--transition-speed);
+    }
+
+    .text-input:focus, .file-input:focus {
+        border-color: var(--primary-color);
+        outline: none;
+    }
+
+    .btn {
+        display: inline-block;
+        padding: 0.75rem 1.5rem;
+        background-color: var(--primary-color);
+        color: #fff;
+        border: none;
+        border-radius: var(--border-radius);
+        cursor: pointer;
+        font-size: 1rem;
+        transition: background-color var(--transition-speed);
+    }
+
+    .btn:hover {
+        background-color: var(--primary-color-hover);
+    }
+
+    .message {
+        margin-top: 1rem;
+        font-size: 1.1rem;
+        color: var(--secondary-color);
+    }
+
+    .uploading-message {
+        text-align: center;
+        margin-top: 1rem;
+    }
+
+    .icons {
+        margin-top: 1rem;
+    }
+
+    .rotating-icon {
+        display: inline-block;
+        font-size: 2rem;
+        margin: 0 0.5rem;
+        animation: rotate 2s linear infinite;
+    }
+</style>
+
+

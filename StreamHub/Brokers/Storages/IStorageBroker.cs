@@ -2,5 +2,5 @@
 {
     public partial interface IStorageBroker
 
-    { }
+    {}
 }

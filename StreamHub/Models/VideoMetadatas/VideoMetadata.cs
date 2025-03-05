@@ -1,4 +1,4 @@
-﻿namespace StreamHub.Models.Foundations.VideoMetadatas
+﻿namespace StreamHub.Models.VideoMetadatas
 {
     public class VideoMetadata
     {
@@ -6,7 +6,7 @@
         public string Title { get; set; }
         public string Description { get; set; }
         public string VideoUrl { get; set; }
-        public string Thubnail { get; set; }
+        public string Thumbnail { get; set; }
         public DateTimeOffset CreatedDate { get; set; }
         public DateTimeOffset UpdatedDate { get; set; }
     }

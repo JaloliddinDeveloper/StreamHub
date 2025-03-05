@@ -1,0 +1,22 @@
+﻿@page "/video-chat"
+@rendermode InteractiveServer
+@inject IJSRuntime JS
+
+<h3>Blazor Video Chat</h3>
+<button @onclick="StartCall">Start Call</button>
+
+<div>
+    <video id="localVideo" autoplay playsinline></video>
+    <video id="remoteVideo" autoplay playsinline></video>
+</div>
+<h1>
+    Count: @count
+</h1>
+@code {
+    private int count = 0;
+    private async Task StartCall()
+    {
+        count++;
+        await JS.InvokeVoidAsync("startCall", "localVideo");
+    }
+}
