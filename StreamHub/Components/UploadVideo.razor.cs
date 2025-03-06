@@ -53,9 +53,11 @@ namespace StreamHub.Components
                 Message = "Biroz kuting, video yuklanmoqda...";
                 StateHasChanged();
 
-                string uploadsFolder = "/var/www/files/Videos";
-                string thumbnailsFolder = "/var/www/files/Thumbnails";
+                // wwwroot ichidagi to‘g‘ridan-to‘g‘ri yo‘nalish
+                string uploadsFolder = Path.Combine(this.Env.WebRootPath, "Videos");
+                string thumbnailsFolder = Path.Combine(this.Env.WebRootPath, "Thumbnails");
 
+                // Papkalarni yaratish
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
@@ -86,8 +88,8 @@ namespace StreamHub.Components
                     Id = Guid.NewGuid(),
                     Title = videoTitle,
                     Description = videoDescription,
-                    VideoUrl = $"/files/Videos/{uniqueVideoFileName}",
-                    Thumbnail = $"/files/Thumbnails/{uniqueThumbnailFileName}",
+                    VideoUrl = $"/Videos/{uniqueVideoFileName}",
+                    Thumbnail = $"/Thumbnails/{uniqueThumbnailFileName}",
                     CreatedDate = DateTimeOffset.UtcNow,
                     UpdatedDate = DateTimeOffset.UtcNow
                 };
@@ -105,5 +107,6 @@ namespace StreamHub.Components
                 StateHasChanged();
             }
         }
+
     }
 }
