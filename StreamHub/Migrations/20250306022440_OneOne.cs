@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace StreamHub.Migrations
 {
     /// <inheritdoc />
-    public partial class One : Migration
+    public partial class OneOne : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

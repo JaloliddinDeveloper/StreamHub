@@ -12,8 +12,8 @@ using StreamHub.Brokers.Storages;
 namespace StreamHub.Migrations
 {
     [DbContext(typeof(StorageBroker))]
-    [Migration("20250306011502_One")]
-    partial class One
+    [Migration("20250306022440_OneOne")]
+    partial class OneOne
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
