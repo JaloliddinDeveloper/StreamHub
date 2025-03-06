@@ -2,7 +2,7 @@
 
 namespace StreamHub.Brokers.Storages
 {
-    public partial class StorageBroker : DbContext, IStorageBroker
+    public partial class StorageBroker:DbContext, IStorageBroker
     {
         private readonly IConfiguration configuration;
 
@@ -17,7 +17,7 @@ namespace StreamHub.Brokers.Storages
             string connectionString =
                 configuration.GetConnectionString("DefaultConnection");
 
-            optionsBuilder.UseSqlServer(connectionString);
+            optionsBuilder.UseNpgsql(connectionString);
         }
 
         private async ValueTask<T> InsertAsync<T>(T @object)

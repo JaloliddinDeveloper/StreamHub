@@ -1,0 +1,78 @@
+﻿@page "/delete"
+@rendermode InteractiveServer
+
+<PageTitle>Videolar</PageTitle>
+
+@if (videoMetadatas != null && videoMetadatas.Any())
+{
+    <div class="video-grid">
+        @foreach (var Video in videoMetadatas)
+        {
+            <div class="video-card">
+                <div class="video-info">
+                    <h3 class="video-title">@Video.Title</h3>
+                    <p class="video-description">@Video.Description</p>
+                </div>
+                <button class="delete-btn" @onclick="() => DeleteVideo(Video.Id)">❌ Delete</button>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>Loading videos...</p>
+}
+
+<style>
+    .video-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 16px;
+        padding: 20px;
+        max-width: 1200px;
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .video-card {
+        background: #181818;
+        border-radius: 12px;
+        padding: 12px;
+        color: white;
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        border: 1px solid #282828;
+    }
+
+    .video-title {
+        font-size: 16px;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: #fff;
+    }
+
+    .video-description {
+        font-size: 14px;
+        color: #aaa;
+    }
+
+    /* Delete Button */
+    .delete-btn {
+        background: red;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        font-size: 14px;
+        cursor: pointer;
+        border-radius: 6px;
+        margin-top: 10px;
+    }
+
+        .delete-btn:hover {
+            background: darkred;
+        }
+</style>
+
+
