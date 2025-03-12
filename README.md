@@ -1,2 +1,2 @@
-# StreamHub-
+# StreamHub
 Video oqimlari (streaming) markazi.
