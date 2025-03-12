@@ -20,14 +20,24 @@ internal class Program
             options.MultipartBodyLengthLimit = 1073741824;
         });
 
+        // CORS ni qo'shish
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll",
+                policy => policy.AllowAnyOrigin()
+                                .AllowAnyMethod()
+                                .AllowAnyHeader());
+        });
+
         var app = builder.Build();
 
         app.UseStaticFiles();
         app.UseRouting();
 
+        // CORS ni ishga tushirish
+        app.UseCors("AllowAll");
 
         app.UseAntiforgery();
-
         app.UseHttpsRedirection();
 
         app.MapRazorComponents<App>()
