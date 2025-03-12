@@ -1,5 +1,10 @@
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using StreamHub.Models.VideoMetadatas;
+using StreamHub.Services.Foundations;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace StreamHub.Components
 {
@@ -24,82 +29,39 @@ namespace StreamHub.Components
 
         private async Task SaveVideoToWwwRoot()
         {
-            if (selectedVideoFile == null)
-            {
-                Message = "Iltimos, video faylni tanlang!";
-                return;
-            }
-            if (selectedThumbnailFile == null)
-            {
-                Message = "Iltimos, thumbnail faylni tanlang!";
-                return;
-            }
-            if (string.IsNullOrWhiteSpace(videoTitle) || string.IsNullOrWhiteSpace(videoDescription))
-            {
-                Message = "Iltimos, Title va Description ni kiriting!";
-                return;
-            }
-
-            const long MaxVideoSize = 1073741824;
-            if (selectedVideoFile.Size > MaxVideoSize)
-            {
-                Message = "Xatolik: Video hajmi 1GB dan oshmasligi kerak!";
-                return;
-            }
+            if (!ValidateInputs()) return;
 
             try
             {
                 isUploading = true;
-                Message = "Biroz kuting, video yuklanmoqda...";
+                Message = "Uploading...";
                 StateHasChanged();
 
-                // wwwroot ichidagi to‘g‘ridan-to‘g‘ri yo‘nalish
-                string uploadsFolder = Path.Combine(this.Env.WebRootPath, "Videos");
-                string thumbnailsFolder = Path.Combine(this.Env.WebRootPath, "Thumbnails");
+                // Upload files in parallel for faster processing
+                var videoTask = SaveFileAsync(selectedVideoFile, "Videos");
+                var thumbnailTask = SaveFileAsync(selectedThumbnailFile, "Thumbnails");
 
-                // Papkalarni yaratish
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-                if (!Directory.Exists(thumbnailsFolder))
-                {
-                    Directory.CreateDirectory(thumbnailsFolder);
-                }
+                await Task.WhenAll(videoTask, thumbnailTask);
 
-                string uniqueVideoFileName = $"{Guid.NewGuid()}{Path.GetExtension(selectedVideoFile.Name)}";
-                string videoFilePath = Path.Combine(uploadsFolder, uniqueVideoFileName);
-
-                using (var stream = new FileStream(videoFilePath, FileMode.Create))
-                {
-                    await selectedVideoFile.OpenReadStream(MaxVideoSize).CopyToAsync(stream);
-                }
-
-                string uniqueThumbnailFileName = $"{Guid.NewGuid()}{Path.GetExtension(selectedThumbnailFile.Name)}";
-                string thumbnailFilePath = Path.Combine(thumbnailsFolder, uniqueThumbnailFileName);
-
-                using (var thumbStream = new FileStream(thumbnailFilePath, FileMode.Create))
-                {
-                    await selectedThumbnailFile.OpenReadStream(10485760).CopyToAsync(thumbStream);
-                }
-
-                VideoMetadata videoMetadata = new VideoMetadata
+                // Save metadata to database
+                var videoMetadata = new VideoMetadata
                 {
                     Id = Guid.NewGuid(),
                     Title = videoTitle,
                     Description = videoDescription,
-                    VideoUrl = $"/Videos/{uniqueVideoFileName}",
-                    Thumbnail = $"/Thumbnails/{uniqueThumbnailFileName}",
+                    VideoUrl = $"/Videos/{Path.GetFileName(videoTask.Result)}",
+                    Thumbnail = $"/Thumbnails/{Path.GetFileName(thumbnailTask.Result)}",
                     CreatedDate = DateTimeOffset.UtcNow,
                     UpdatedDate = DateTimeOffset.UtcNow
                 };
 
                 await VideoMetadataService.AddVideoMetadataAsync(videoMetadata);
-                Message = "Video yuklandi!";
+
+                Message = "<span style='color:green;'>Video uploaded successfully!</span>";
             }
             catch (Exception ex)
             {
-                Message = "Xatolik: " + ex.Message;
+                Message = $"<span style='color:red;'>Error: {ex.Message}</span>";
             }
             finally
             {
@@ -108,5 +70,54 @@ namespace StreamHub.Components
             }
         }
 
+        private bool ValidateInputs()
+        {
+            if (selectedVideoFile == null)
+            {
+                Message = "<span style='color:red;'>Please select a video file!</span>";
+                return false;
+            }
+
+            if (selectedThumbnailFile == null)
+            {
+                Message = "<span style='color:red;'>Please select a thumbnail file!</span>";
+                return false;
+            }
+
+            if (string.IsNullOrWhiteSpace(videoTitle) || string.IsNullOrWhiteSpace(videoDescription))
+            {
+                Message = "<span style='color:red;'>Please enter title and description!</span>";
+                return false;
+            }
+
+            const long MaxVideoSize = 1073741824; // 1GB
+            if (selectedVideoFile.Size > MaxVideoSize)
+            {
+                Message = "<span style='color:red;'>Video size must be less than 1GB!</span>";
+                return false;
+            }
+
+            return true;
+        }
+
+        private async Task<string> SaveFileAsync(IBrowserFile file, string folderName)
+        {
+            string uploadsFolder = Path.Combine(Env.WebRootPath, folderName);
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string uniqueFileName = $"{Guid.NewGuid()}{Path.GetExtension(file.Name)}";
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            await using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.OpenReadStream(file.Size).CopyToAsync(stream);
+            }
+
+            return filePath;
+        }
     }
 }

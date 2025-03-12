@@ -25,6 +25,7 @@ internal class Program
         app.UseStaticFiles();
         app.UseRouting();
 
+
         app.UseAntiforgery();
 
         app.UseHttpsRedirection();
