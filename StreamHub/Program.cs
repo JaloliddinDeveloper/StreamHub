@@ -20,14 +20,25 @@ internal class Program
             options.MultipartBodyLengthLimit = 1073741824;
         });
 
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll",
+                policy => policy.AllowAnyOrigin()
+                                .AllowAnyMethod()
+                                .AllowAnyHeader());
+        });
+
         var app = builder.Build();
+
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseExceptionHandler("/Error");
+        }
 
         app.UseStaticFiles();
         app.UseRouting();
-
+        app.UseCors("AllowAll");
         app.UseAntiforgery();
-
-        app.UseHttpsRedirection();
 
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();
