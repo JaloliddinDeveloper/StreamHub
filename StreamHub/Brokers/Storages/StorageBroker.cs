@@ -14,10 +14,11 @@ namespace StreamHub.Brokers.Storages
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string connectionString =
-                configuration.GetConnectionString("DefaultConnection");
+            string connection =
+                this.configuration.GetConnectionString("DefaultConnection");
 
-            optionsBuilder.UseNpgsql(connectionString);
+            optionsBuilder.UseMySql(connection,
+                ServerVersion.AutoDetect(connection));
         }
 
         private async ValueTask<T> InsertAsync<T>(T @object)
